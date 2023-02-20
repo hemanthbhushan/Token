@@ -23,6 +23,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
     address[] public storeAddress;
    mapping(address=>TokenDetails) public registerToken;
+   mapping(address=>bool) public registered;
 
     event tokenRegistered(
         address indexed tokenAddress,
@@ -64,33 +65,35 @@ import "@openzeppelin/contracts/access/Ownable.sol";
     function registerTokens(TokenDetails memory tokenDetails,address _tokenAddress) public onlyOwner  {
 
         require(_tokenAddress!= address(0) ,"invalid Token address");
+        require(!registered[_tokenAddress],"token address is already registered");
 
         registerToken[_tokenAddress] = TokenDetails({
             name:tokenDetails.name,
             symbol:tokenDetails.symbol,
             decimals:tokenDetails.decimals,
             initialSupply:tokenDetails.initialSupply
-        }); 
+        });
+        registered[_tokenAddress] = true; 
         storeAddress.push(_tokenAddress);
 
 
         emit tokenRegistered(_tokenAddress,tokenDetails);
     }
 
-     function unregisterTokens(address tokenAddress) external onlyOwner  {
+     function unregisterTokens(address _tokenAddress) external onlyOwner  {
 
-        require(tokenAddress!= address(0) ,"invalid Token address");
-        // require(registerToken[tokenAddress]==,"");
+        require(_tokenAddress!= address(0) ,"invalid Token address");
+        require(registered[_tokenAddress],"token address is not registered");
         
 
-         TokenDetails memory details = registerToken[tokenAddress];
+         TokenDetails memory details = registerToken[_tokenAddress];
 
          
 
-         delete registerToken[tokenAddress]; 
+         delete registerToken[_tokenAddress]; 
 
 
-        emit tokenUnregistered(tokenAddress,details.name,details.symbol);
+        emit tokenUnregistered(_tokenAddress,details.name,details.symbol);
 
     }
 
