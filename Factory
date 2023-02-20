@@ -43,9 +43,9 @@ import "./TokenContract.sol";
         string calldata _symbol,
         uint8 _decimals,
         uint256 _initialSupply
-    ) external onlyAdmin returns (TokenContract creditsAddress) {
+    ) external onlyAdmin returns (TokenContract tokenAddress) {
 
-        TokenContract tokenAddress = new TokenContract(
+         tokenAddress = new TokenContract(
             _name,
             _symbol
         );
