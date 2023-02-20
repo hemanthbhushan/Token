@@ -2,12 +2,21 @@
 pragma solidity ^0.8.11;
 
 contract TokenContract{
-    
+    address public owner;
     struct TokenDetails{
         string name;
         string symbol;
     }
+
+
     mapping(address=>TokenDetails) public registerToken;
+    mapping(address => bool) internal frozen;
+   mapping(address => bool) internal blankList;
+
+     modifier onlyAdmin() {
+        require(msg.sender == owner, "onlyAdmin");
+        _;
+    }
 
       event tokenRegistered(
         address indexed tokenAddress,
@@ -20,9 +29,20 @@ contract TokenContract{
         string indexed symbol
     );
 
+    event AddressFrozen(address indexed addr);
+    event AddressUnfrozen(address indexed addr);
+    event blankListed(address[] indexed addr);
+    event removeBlankListed(address[] indexed addr);
+    
+    
+
+    constructor(){
+         owner = msg.sender;
+    }
 
 
-    function registerTokens(TokenDetails calldata tokenDetails,address tokenAddress) external {
+
+    function registerTokens(TokenDetails calldata tokenDetails,address tokenAddress) external onlyAdmin {
 
         require(tokenAddress!= address(0) ,"invalid Token address");
 
@@ -38,7 +58,7 @@ contract TokenContract{
 
     }
 
-     function unregisterTokens(address tokenAddress) external  {
+     function unregisterTokens(address tokenAddress) external onlyAdmin  {
 
         require(tokenAddress!= address(0) ,"invalid Token address");
 
@@ -48,6 +68,44 @@ contract TokenContract{
 
 
         emit tokenUnregistered(tokenAddress,details.name,details.symbol);
+
+
+
+    }
+
+     function freeze(address _addr) public onlyAdmin {
+        require(!frozen[_addr], "address already frozen");
+        frozen[_addr] = true;
+        emit AddressFrozen(_addr);
+    }
+
+    function unfreeze(address _addr) public  {
+        require(frozen[_addr], "address already unfrozen");
+        frozen[_addr] = false;
+        emit AddressUnfrozen(_addr);
+    }
+
+    function addBlankList(address[] memory _blankList) public onlyAdmin{
+
+        for(uint i = 0; i<_blankList.length;i++){
+
+            blankList[_blankList[i]] = true;
+
+        }
+        emit blankListed(_blankList);
+
+
+
+    }
+
+     function removeBlankList(address[] memory _removeBlankList) public onlyAdmin{
+
+        for(uint i = 0; i<_removeBlankList.length;i++){
+
+            blankList[_removeBlankList[i]] = false;
+
+        }
+        emit removeBlankListed(_removeBlankList);
 
 
 
