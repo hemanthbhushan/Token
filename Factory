@@ -41,18 +41,18 @@ import "./TokenContract.sol";
         function CreateERC20Token(
         string calldata _name,
         string calldata _symbol,
-        uint8 decimals,
-        uint256 initialSupply
+        uint8 _decimals,
+        uint256 _initialSupply
     ) external onlyAdmin returns (TokenContract creditsAddress) {
 
-        TokenContract newCredits = new TokenContract(
+        TokenContract tokenAddress = new TokenContract(
             _name,
             _symbol
         );
-        registerTokens(TokenDetails({name:_name,symbol:_symbol}),address(newCredits));
+        registerTokens(TokenDetails({name:_name,symbol:_symbol,decimals:_decimals,initialSupply: _initialSupply}),address(tokenAddress));
 
-        // tokenAddress.push(address(newCredits));
-        return newCredits;
+        
+        return tokenAddress;
     }
 
 
@@ -63,7 +63,9 @@ import "./TokenContract.sol";
 
         registerToken[tokenAddress] = TokenDetails({
             name:tokenDetails.name,
-            symbol:tokenDetails.symbol
+            symbol:tokenDetails.symbol,
+            decimals:tokenDetails.decimals,
+            initialSupply:tokenDetails.initialSupply
         }); 
 
 
