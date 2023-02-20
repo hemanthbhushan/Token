@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.11;
+
+contract TokenContract{
+    
+    struct TokenDetails{
+        string name;
+        string symbol;
+    }
+    mapping(address=>TokenDetails) public registerToken;
+
+      event tokenRegistered(
+        address indexed tokenAddress,
+        TokenDetails indexed tokenDetails
+    );
+
+        event tokenUnregistered(
+        address indexed tokenAddress,
+        string indexed name,
+        string indexed symbol
+    );
+
+
+
+    function registerTokens(TokenDetails calldata tokenDetails,address tokenAddress) external {
+
+        require(tokenAddress!= address(0) ,"invalid Token address");
+
+        registerToken[tokenAddress] = TokenDetails({
+            name:tokenDetails.name,
+            symbol:tokenDetails.symbol
+        }); 
+
+
+        emit tokenRegistered(tokenAddress,tokenDetails);
+
+
+
+    }
+
+     function unregisterTokens(address tokenAddress) external  {
+
+        require(tokenAddress!= address(0) ,"invalid Token address");
+
+         TokenDetails memory details = registerToken[tokenAddress];
+
+         delete registerToken[tokenAddress]; 
+
+
+        emit tokenUnregistered(tokenAddress,details.name,details.symbol);
+
+
+
+    }
+
+
+
+
+}
